@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-require 'rubygems'
-require 'json'
-
 class CurrencyConverter
 
   attr_reader :from, :to, :rate
