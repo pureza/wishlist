@@ -1,0 +1,26 @@
+wishlist
+========
+
+wishlist is a small application that fetches book prices from a variety of
+sources simultaneously.
+
+
+* Requirements
+
+- Ruby (1.8)
+
+- hpricot (0.8.4)
+  gem install hpricot --source http://gemcutter.org
+
+- schleyfox-peach (0.3)
+  gem install schleyfox-peach --source=http://gems.github.com
+
+
+* Usage
+
+./wishlist <amazon wishlist URL>
+
+To experiment with my wishlist:
+
+./wishlist  "http://www.amazon.co.uk/registry/wishlist/LZFWWJ0ZZGYC/ref=cm_wl_act_vv?_encoding=UTF8&visitor-view=1&reveal="
+

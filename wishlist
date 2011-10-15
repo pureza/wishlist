@@ -1,0 +1,62 @@
+#! /usr/bin/env ruby
+# -*- coding: utf-8 -*-
+
+require 'engine'
+require 'amazon-engine'
+require 'bookdepository-engine'
+require 'currency-converter'
+
+require 'rubygems'
+require 'hpricot'
+require 'open-uri'
+require 'peach'
+
+
+def fetch_wishlist(url)
+  doc = open(url) { |f| Hpricot(f) }
+  (doc/"span.productTitle//a").map { |a| [a.inner_html, a.attributes['href'].scan(/dp\/(\d+X?)/)[0]] }
+end
+
+
+engines = [AmazonEngine.new('amazon.com', CurrencyConverter.new(:usd)),
+           AmazonEngine.new('amazon.co.uk', CurrencyConverter.new(:gbp)),
+           AmazonEngine.new('amazon.es', CurrencyConverter.new(:eur)),
+           BookDepositoryEngine.new('bookdepository.com', 'bookdep.com'),
+           BookDepositoryEngine.new('bookdepository.co.uk', 'bookdep.co.uk')]
+
+if ARGV.length != 1
+    puts "Usage: wishlist <amazon wishlist url>"
+    exit
+end
+
+wishlist_url = ARGV[0]
+
+books = fetch_wishlist(wishlist_url)
+
+printf(" " * 40)
+for engine in engines
+  printf("%15s ", engine.name)
+end
+puts
+
+books.each do |title, isbn|
+  results = engines.pmap { |e| e.lookup(isbn) }
+  cheapest = results.select { |p| p != 0 }.min
+
+  printf("%-40s", title[0 .. 39])
+  for price in results
+    if (price != 0)
+      printf("%14s ", "#{price} EUR")
+    else
+      printf("%14s ", "")
+    end
+
+    if (price == cheapest)
+      printf("*")
+     else
+      printf(" ")
+    end
+  end
+  puts
+end
+
